@@ -1,0 +1,928 @@
+<!DOCTYPE html>
+<html lang="th">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ER MPH Nurse Note</title>
+    <!-- Tailwind CSS (v4) เพื่อสีสันสดใส ทันสมัย และ Responsive -->
+    <script src="https://cdn.jsdelivr.net/npm/@tailwindcss/browser@4"></script>
+    <!-- Google Fonts (Sarabun) -->
+    <link href="https://fonts.googleapis.com/css2?family=Sarabun:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <!-- FontAwesome สำหรับไอคอนโลโก้และปุ่ม -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        body { font-family: 'Sarabun', sans-serif; }
+    </style>
+</head>
+<body class="bg-gradient-to-br from-indigo-50 via-slate-50 to-pink-50 min-h-screen text-slate-800 antialiased">
+
+    <!-- App Header & Logo Section -->
+    <header class="bg-gradient-to-r from-pink-500 via-purple-500 to-indigo-600 text-white shadow-xl sticky top-0 z-50 backdrop-blur-md bg-opacity-95">
+        <div class="max-w-7xl mx-auto px-4 py-3 flex flex-col sm:flex-row items-center justify-between gap-3">
+            <div class="flex items-center space-x-4">
+                <!-- โลโก้ App สวยงามโดดเด่น -->
+                <div class="bg-white p-2.5 rounded-2xl shadow-lg flex items-center justify-center w-14 h-14 border-2 border-pink-300">
+                    <i class="fa-solid fa-file-medical-pulse text-pink-500 text-3xl animate-pulse"></i>
+                </div>
+                <div>
+                    <h1 class="text-2xl font-black tracking-wide drop-shadow-md">ER MPH Nurse Note</h1>
+                    <p class="text-xs text-pink-100 font-medium tracking-wider flex items-center gap-1">
+                        <span class="inline-block w-2 h-2 rounded-full bg-green-400 animate-ping"></span> Live Tracking System 2026
+                    </p>
+                </div>
+            </div>
+            <div class="text-center sm:text-right text-xs bg-white/10 backdrop-blur-xs px-4 py-2 rounded-xl border border-white/20">
+                <div class="font-bold text-yellow-300 tracking-wide">By Bunchai Juntama ENP 2026</div>
+                <div id="liveClock" class="font-mono mt-0.5 text-slate-100">🕒 กำลังโหลดเวลา...</div>
+            </div>
+        </div>
+    </header>
+
+    <main class="max-w-7xl mx-auto px-4 py-6 grid grid-cols-1 lg:grid-cols-3 gap-6">
+        
+        <!-- Left Column: Input Form (ประกอบไปด้วยหัวข้อทั้งหมดครบถ้วน) -->
+        <div class="lg:col-span-2 space-y-6">
+            
+            <!-- 1. ข้อมูลผู้ป่วยพื้นฐาน -->
+            <div class="bg-white rounded-2xl p-6 shadow-md border-t-4 border-indigo-500 hover:shadow-lg transition-all duration-300">
+                <h2 class="text-lg font-bold text-indigo-700 mb-4 flex items-center gap-2">
+                    <i class="fa-solid fa-address-card text-xl"></i> ข้อมูลผู้ป่วยเบื้องต้น
+                </h2>
+                <div class="grid grid-cols-1 sm:grid-cols-3 gap-4 mb-4">
+                    <div>
+                        <label class="block text-sm font-bold text-slate-700 mb-1">📋 HN</label>
+                        <input type="text" id="hn" oninput="updateSummaryPanel()" class="w-full bg-slate-50 border-2 border-slate-200 focus:border-indigo-400 focus:bg-white rounded-xl p-2.5 outline-none transition" placeholder="ระบุ HN ผู้ป่วย">
+                    </div>
+                    <div>
+                        <label class="block text-sm font-bold text-slate-700 mb-1">👥 อายุ (ปี)</label>
+                        <input type="number" id="age" oninput="updateSummaryPanel()" class="w-full bg-slate-50 border-2 border-slate-200 focus:border-indigo-400 focus:bg-white rounded-xl p-2.5 outline-none transition" placeholder="ระบุอายุ">
+                    </div>
+                    <div>
+                        <label class="block text-sm font-bold text-slate-700 mb-1">👩‍❤️‍👨 เพศ</label>
+                        <select id="gender" onchange="updateSummaryPanel()" class="w-full bg-slate-50 border-2 border-slate-200 focus:border-indigo-400 focus:bg-white rounded-xl p-2.5 outline-none transition">
+                            <option value="">-- ระบุเพศ --</option>
+                            <option value="ชาย">ชาย</option>
+                            <option value="หญิง">หญิง</option>
+                        </select>
+                    </div>
+                </div>
+                
+                <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
+                    <div>
+                        <label class="block text-sm font-bold text-slate-700 mb-1">📆 วันที่</label>
+                        <div class="flex gap-2">
+                            <input type="date" id="visitDate" class="w-full bg-slate-50 border-2 border-slate-200 rounded-xl p-2 text-sm outline-none">
+                            <button type="button" onclick="setTodayDate('visitDate')" class="bg-gradient-to-r from-cyan-500 to-blue-500 hover:from-cyan-600 hover:to-blue-600 text-white font-bold text-xs px-3 rounded-xl shadow-sm transition active:scale-95 flex items-center gap-1">Today</button>
+                        </div>
+                    </div>
+                    <div>
+                        <label class="block text-sm font-bold text-slate-700 mb-1">🏥 Visit ER เวลา</label>
+                        <div class="flex gap-2">
+                            <input type="time" id="visitTime" class="w-full bg-slate-50 border-2 border-slate-200 rounded-xl p-2 text-sm outline-none">
+                            <button type="button" onclick="setNowTime('visitTime')" class="bg-gradient-to-r from-cyan-500 to-blue-500 hover:from-cyan-600 hover:to-blue-600 text-white font-bold text-xs px-3 rounded-xl shadow-sm transition active:scale-95 flex items-center gap-1">Now</button>
+                        </div>
+                    </div>
+                    <div>
+                        <label class="block text-sm font-bold text-slate-700 mb-1">📊 First ER Triage เวลา</label>
+                        <div class="flex gap-2">
+                            <input type="time" id="firstTriageTime" class="w-full bg-slate-50 border-2 border-slate-200 rounded-xl p-2 text-sm outline-none">
+                            <button type="button" onclick="setNowTime('firstTriageTime')" class="bg-gradient-to-r from-cyan-500 to-blue-500 hover:from-cyan-600 hover:to-blue-600 text-white font-bold text-xs px-3 rounded-xl shadow-sm transition active:scale-95 flex items-center gap-1">Now</button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- 2. Vital Signs & Scoring -->
+            <div class="bg-white rounded-2xl p-6 shadow-md border-t-4 border-amber-500 hover:shadow-lg transition-all duration-300 bg-gradient-to-br from-white to-amber-50/20">
+                <h2 class="text-lg font-bold text-amber-700 mb-4 flex items-center justify-between">
+                    <span class="flex items-center gap-2"><i class="fa-solid fa-heart-pulse text-xl text-amber-500"></i> 📚 Vital signs แรกรับ & Scoring</span>
+                    <button type="button" onclick="clearVitalSigns()" class="text-xs bg-rose-100 hover:bg-rose-200 text-rose-600 font-bold px-3 py-1.5 rounded-xl transition flex items-center gap-1">
+                        <i class="fa-solid fa-trash-can"></i> Clear VS
+                    </button>
+                </h2>
+                
+                <div class="grid grid-cols-2 sm:grid-cols-5 gap-3 mb-4">
+                    <div>
+                        <label class="block text-xs font-bold text-slate-600 mb-1">BT (°C)</label>
+                        <input type="number" step="0.1" id="vsBt" oninput="calculateScores()" class="w-full border-2 border-slate-200 rounded-xl p-2 text-sm focus:border-amber-400 outline-none" placeholder="36.5">
+                    </div>
+                    <div>
+                        <label class="block text-xs font-bold text-slate-600 mb-1">RR (/min)</label>
+                        <input type="number" id="vsRr" oninput="calculateScores()" class="w-full border-2 border-slate-200 rounded-xl p-2 text-sm focus:border-amber-400 outline-none" placeholder="20">
+                    </div>
+                    <div>
+                        <label class="block text-xs font-bold text-slate-600 mb-1">HR (/min)</label>
+                        <input type="number" id="vsHr" oninput="calculateScores()" class="w-full border-2 border-slate-200 rounded-xl p-2 text-sm focus:border-amber-400 outline-none" placeholder="80">
+                    </div>
+                    <div>
+                        <label class="block text-xs font-bold text-slate-600 mb-1">BP (mmHg)</label>
+                        <input type="text" id="vsBp" class="w-full border-2 border-slate-200 rounded-xl p-2 text-sm focus:border-amber-400 outline-none" placeholder="120/80">
+                    </div>
+                    <div>
+                        <label class="block text-xs font-bold text-slate-600 mb-1">SpO2 (%)</label>
+                        <input type="number" id="vsSpo2" oninput="calculateScores()" class="w-full border-2 border-slate-200 rounded-xl p-2 text-sm focus:border-amber-400 outline-none" placeholder="98">
+                    </div>
+                </div>
+
+                <div class="grid grid-cols-1 md:grid-cols-3 gap-4 mb-4">
+                    <div>
+                        <label class="block text-xs font-bold text-slate-600 mb-1">ความต้องการใช้ออกซิเจน</label>
+                        <select id="vsO2Support" onchange="calculateScores()" class="w-full border-2 border-slate-200 rounded-xl p-2 text-sm bg-white outline-none">
+                            <option value="ไม่ใช้">ไม่ใช้ (Room Air)</option>
+                            <option value="ใช้">ใช้ (Oxygen Support)</option>
+                        </select>
+                    </div>
+                    <div>
+                        <label class="block text-xs font-bold text-slate-600 mb-1">SpO2 Scale (สำหรับ NEWS2)</label>
+                        <select id="vsSpo2Scale" onchange="calculateScores()" class="w-full border-2 border-slate-200 rounded-xl p-2 text-sm bg-white outline-none">
+                            <option value="1">Scale 1 (ผู้ป่วยทั่วไป)</option>
+                            <option value="2">Scale 2 (Hypercapnic Respiratory Failure เช่น COPD)</option>
+                        </select>
+                    </div>
+                    <div>
+                        <label class="block text-xs font-bold text-slate-600 mb-1">ระดับความรู้สึกตัว</label>
+                        <select id="vsConscious" onchange="calculateScores()" class="w-full border-2 border-slate-200 rounded-xl p-2 text-sm bg-white outline-none">
+                            <option value="A">Alert (A)</option>
+                            <option value="V">Voice (V)</option>
+                            <option value="P">Pain (P)</option>
+                            <option value="U">Unresponsive (U)</option>
+                        </select>
+                    </div>
+                </div>
+
+                <!-- Score Dashboard Display -->
+                <div class="grid grid-cols-1 sm:grid-cols-2 gap-4 bg-slate-100 p-4 rounded-xl mb-4 border border-slate-200 shadow-inner">
+                    <div class="flex items-center justify-between p-3 bg-white rounded-xl shadow-xs">
+                        <span class="font-bold text-sm text-slate-700">SIRS Score:</span>
+                        <span id="sirsBadge" class="px-3 py-1 rounded-full text-xs font-black bg-slate-200 text-slate-700">0 คะแนน</span>
+                    </div>
+                    <div class="flex items-center justify-between p-3 bg-white rounded-xl shadow-xs">
+                        <span class="font-bold text-sm text-slate-700">NEWS2 Score:</span>
+                        <span id="newsBadge" class="px-3 py-1 rounded-full text-xs font-black bg-slate-200 text-slate-700">0 คะแนน</span>
+                    </div>
+                </div>
+
+                <div class="flex justify-end">
+                    <button type="button" onclick="saveVitalSigns()" class="bg-gradient-to-r from-amber-500 to-orange-500 hover:from-amber-600 hover:to-orange-600 text-white font-bold px-5 py-2 rounded-xl text-sm shadow-md transition active:scale-95 flex items-center gap-2">
+                        <i class="fa-solid fa-download"></i> บันทึกใน Note Summary
+                    </button>
+                </div>
+            </div>
+
+            <!-- 3. Nurse Triage & Level Triage & Primary Survey -->
+            <div class="bg-white rounded-2xl p-6 shadow-md border-t-4 border-purple-500 hover:shadow-lg transition-all duration-300">
+                <h2 class="text-lg font-bold text-purple-700 mb-4 flex items-center gap-2">
+                    <i class="fa-solid fa-user-nurse text-xl"></i> Triage & Primary Survey
+                </h2>
+                
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-4 mb-5">
+                    <div class="p-3 bg-purple-50/50 rounded-xl border border-purple-100">
+                        <label class="block text-sm font-bold text-purple-900 mb-1">👩🏼‍⚕️ Nurse triage ระบุ</label>
+                        <div class="flex gap-2">
+                            <input type="text" id="nurseTriage" class="w-full border-2 border-slate-200 rounded-xl p-2 text-sm bg-white outline-none" placeholder="ระบุอาการคัดกรอง">
+                            <div class="flex gap-1 items-center">
+                                <input type="time" id="nurseTriageTime" class="w-24 border-2 border-slate-200 rounded-xl p-2 text-sm bg-white">
+                                <button type="button" onclick="setNowTime('nurseTriageTime')" class="bg-purple-600 text-white font-bold text-xs px-2.5 py-2.5 rounded-xl">Now</button>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="p-3 bg-purple-50/50 rounded-xl border border-purple-100">
+                        <label class="block text-sm font-bold text-purple-900 mb-1">🆘 Level Triage กดเลือก</label>
+                        <div class="flex gap-2">
+                            <select id="esiLevel" class="w-full border-2 border-slate-200 rounded-xl p-2 text-sm bg-white font-bold outline-none text-purple-700">
+                                <option value="">-- เลือก ESI --</option>
+                                <option value="ESI 1">ESI 1 (Resuscitation) 🔴</option>
+                                <option value="ESI 2">ESI 2 (Emergent) 🟠</option>
+                                <option value="ESI 3">ESI 3 (Urgent) 🟡</option>
+                                <option value="ESI 4">ESI 4 (Less Urgent) 🟢</option>
+                                <option value="ESI 5">ESI 5 (Non-Urgent) ⚪</option>
+                            </select>
+                            <div class="flex gap-1 items-center">
+                                <input type="time" id="esiTime" class="w-24 border-2 border-slate-200 rounded-xl p-2 text-sm bg-white">
+                                <button type="button" onclick="setNowTime('esiTime')" class="bg-purple-600 text-white font-bold text-xs px-2.5 py-2.5 rounded-xl">Now</button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <h3 class="font-bold text-sm text-slate-800 mb-3 flex items-center gap-1.5"><i class="fa-solid fa-triangle-exclamation text-rose-500"></i> 🚨 Primary survey ได้แก่:</h3>
+                <div class="space-y-3 bg-slate-50 p-4 rounded-xl border-2 border-slate-200">
+                    <!-- 1. Airway -->
+                    <div class="flex flex-col md:flex-row md:items-center gap-2 bg-white p-2 rounded-xl border border-slate-200">
+                        <span class="w-28 text-xs font-bold text-slate-700">1.) Airway</span>
+                        <select id="psAirway" class="border border-slate-300 rounded-lg p-1.5 text-xs bg-slate-50 font-bold">
+                            <option value="Pass">Pass</option>
+                            <option value="Not pass">Not pass</option>
+                        </select>
+                        <input type="text" id="psAirwayText" class="flex-1 border border-slate-300 rounded-lg p-1.5 text-xs outline-none" placeholder="เขียนระบุรายละเอียด Airway...">
+                        <div class="flex gap-1 items-center">
+                            <input type="time" id="psAirwayTime" class="w-24 border border-slate-300 rounded-lg p-1.5 text-xs bg-white">
+                            <button type="button" onclick="setNowTime('psAirwayTime')" class="bg-purple-500 text-white text-[10px] font-bold px-2 py-2 rounded-lg">Now</button>
+                        </div>
+                    </div>
+                    <!-- 2. Breathing -->
+                    <div class="flex flex-col md:flex-row md:items-center gap-2 bg-white p-2 rounded-xl border border-slate-200">
+                        <span class="w-28 text-xs font-bold text-slate-700">2.) Breathing</span>
+                        <select id="psBreathing" class="border border-slate-300 rounded-lg p-1.5 text-xs bg-slate-50 font-bold">
+                            <option value="Pass">Pass</option>
+                            <option value="Not pass">Not pass</option>
+                        </select>
+                        <input type="text" id="psBreathingText" class="flex-1 border border-slate-300 rounded-lg p-1.5 text-xs outline-none" placeholder="เขียนระบุรายละเอียด Breathing...">
+                        <div class="flex gap-1 items-center">
+                            <input type="time" id="psBreathingTime" class="w-24 border border-slate-300 rounded-lg p-1.5 text-xs bg-white">
+                            <button type="button" onclick="setNowTime('psBreathingTime')" class="bg-purple-500 text-white text-[10px] font-bold px-2 py-2 rounded-lg">Now</button>
+                        </div>
+                    </div>
+                    <!-- 3. Circulation -->
+                    <div class="flex flex-col md:flex-row md:items-center gap-2 bg-white p-2 rounded-xl border border-slate-200">
+                        <span class="w-28 text-xs font-bold text-slate-700">3.) Circulation</span>
+                        <select id="psCirculation" class="border border-slate-300 rounded-lg p-1.5 text-xs bg-slate-50 font-bold">
+                            <option value="Pass">Pass</option>
+                            <option value="Not pass">Not pass</option>
+                        </select>
+                        <input type="text" id="psCirculationText" class="flex-1 border border-slate-300 rounded-lg p-1.5 text-xs outline-none" placeholder="เขียนระบุรายละเอียด Circulation...">
+                        <div class="flex gap-1 items-center">
+                            <input type="time" id="psCirculationTime" class="w-24 border border-slate-300 rounded-lg p-1.5 text-xs bg-white">
+                            <button type="button" onclick="setNowTime('psCirculationTime')" class="bg-purple-500 text-white text-[10px] font-bold px-2 py-2 rounded-lg">Now</button>
+                        </div>
+                    </div>
+                    <!-- 4. Disability -->
+                    <div class="flex flex-col md:flex-row md:items-center gap-2 bg-white p-2 rounded-xl border border-slate-200">
+                        <span class="w-28 text-xs font-bold text-slate-700">4.) Disability</span>
+                        <select id="psDisability" class="border border-slate-300 rounded-lg p-1.5 text-xs bg-slate-50 font-bold">
+                            <option value="Pass">Pass</option>
+                            <option value="Not pass">Not pass</option>
+                        </select>
+                        <input type="text" id="psDisabilityText" class="flex-1 border border-slate-300 rounded-lg p-1.5 text-xs outline-none" placeholder="เขียนระบุรายละเอียด Disability...">
+                        <div class="flex gap-1 items-center">
+                            <input type="time" id="psDisabilityTime" class="w-24 border border-slate-300 rounded-lg p-1.5 text-xs bg-white">
+                            <button type="button" onclick="setNowTime('psDisabilityTime')" class="bg-purple-500 text-white text-[10px] font-bold px-2 py-2 rounded-lg">Now</button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- 4. Interventions & Clinical Care Protocols -->
+            <div class="bg-white rounded-2xl p-6 shadow-md border-t-4 border-emerald-500 hover:shadow-lg transition-all duration-300 space-y-4">
+                <h2 class="text-lg font-bold text-emerald-700 border-b pb-2 flex items-center gap-2">
+                    <i class="fa-solid fa-suitcase-medical text-xl"></i> แผนการรักษาและหัตถการ (Interventions)
+                </h2>
+
+                <!-- Fast Track & Doctor Assessment -->
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                    <div class="p-3 bg-rose-50 rounded-xl border border-rose-200">
+                        <label class="block text-xs font-bold text-rose-900 mb-1">🚑 Alert Fast Track RRT protocol</label>
+                        <div class="flex gap-2">
+                            <select id="rrtProtocol" class="w-full border-2 border-slate-200 rounded-xl p-2 text-xs bg-white font-bold">
+                                <option value="No">No</option>
+                                <option value="Yes">Yes</option>
+                            </select>
+                            <div class="flex gap-1 items-center">
+                                <input type="time" id="rrtTime" class="w-24 border-2 border-slate-200 rounded-xl p-2 text-xs bg-white">
+                                <button type="button" onclick="setNowTime('rrtTime')" class="bg-rose-600 text-white font-bold text-xs px-2.5 py-2.5 rounded-xl">Now</button>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="p-3 bg-sky-50 rounded-xl border border-sky-200">
+                        <label class="block text-xs font-bold text-sky-900 mb-1">🏪 แพทย์ ER ประเมินอาการ ระบุชื่อแพทย์</label>
+                        <div class="flex gap-2">
+                            <input type="text" id="drName" class="w-full border-2 border-slate-200 rounded-xl p-2 text-xs bg-white" placeholder="ระบุชื่อแพทย์...">
+                            <div class="flex gap-1 items-center">
+                                <input type="time" id="drAssessTime" class="w-24 border-2 border-slate-200 rounded-xl p-2 text-xs bg-white">
+                                <button type="button" onclick="setNowTime('drAssessTime')" class="bg-sky-600 text-white font-bold text-xs px-2.5 py-2.5 rounded-xl">Now</button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Doctor Diagnosis -->
+                <div class="p-3 bg-slate-50 rounded-xl border border-slate-200 flex flex-col sm:flex-row sm:items-center justify-between gap-3">
+                    <span class="text-sm font-bold text-slate-700">🧑🏻‍⚕️ แพทย์วินิจฉัยให้การรักษา</span>
+                    <div class="flex gap-2 items-center">
+                        <input type="time" id="drDiagTime" class="w-32 border-2 border-slate-200 rounded-xl p-2 text-xs bg-white">
+                        <button type="button" onclick="setNowTime('drDiagTime')" class="bg-slate-600 text-white font-bold text-xs px-3 py-2 rounded-xl">Now</button>
+                    </div>
+                </div>
+
+                <!-- Oxygen Supplement -->
+                <div class="p-3 bg-amber-50/40 rounded-xl border border-amber-200 space-y-2">
+                    <label class="block text-xs font-bold text-amber-900">🌡️ Oxygen supplement</label>
+                    <div class="grid grid-cols-1 sm:grid-cols-4 gap-2">
+                        <select id="o2Active" class="border-2 border-slate-200 rounded-xl p-2 text-xs bg-white font-bold">
+                            <option value="No">No</option>
+                            <option value="Yes">Yes</option>
+                        </select>
+                        <select id="o2Type" class="border-2 border-slate-200 rounded-xl p-2 text-xs bg-white">
+                            <option value="Cannula">Cannula</option>
+                            <option value="Mask with bag">Mask with bag</option>
+                            <option value="BVM">BVM</option>
+                            <option value="ETT">ETT</option>
+                        </select>
+                        <input type="text" id="o2Flow" class="border-2 border-slate-200 rounded-xl p-2 text-xs bg-white" placeholder="ปริมาณ O2 flow ..... lpm">
+                        <div class="flex gap-1 items-center">
+                            <input type="time" id="o2Time" class="w-full border-2 border-slate-200 rounded-xl p-2 text-xs bg-white">
+                            <button type="button" onclick="setNowTime('o2Time')" class="bg-amber-600 text-white font-bold text-xs px-2.5 py-2.5 rounded-xl">Now</button>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Lab & Stat Parameters -->
+                <div class="grid grid-cols-1 md:grid-cols-3 gap-3">
+                    <div class="p-3 bg-slate-50 rounded-xl border border-slate-200">
+                        <label class="block text-xs font-bold text-slate-700 mb-1">🧪 Investigation Lab ระบุ</label>
+                        <div class="flex gap-1">
+                            <input type="text" id="labText" class="w-full border-2 border-slate-200 rounded-xl p-1.5 text-xs bg-white" placeholder="ระบุผล/แล็บ...">
+                            <input type="time" id="labTime" class="w-20 border-2 border-slate-200 rounded-xl p-1 text-xs bg-white">
+                            <button type="button" onclick="setNowTime('labTime')" class="bg-emerald-600 text-white text-[10px] px-1.5 rounded-lg">Now</button>
+                        </div>
+                    </div>
+                    <div class="p-3 bg-slate-50 rounded-xl border border-slate-200">
+                        <label class="block text-xs font-bold text-slate-700 mb-1">🩸 DTX stat = (mg/dL)</label>
+                        <div class="flex gap-1">
+                            <input type="text" id="dtxValue" class="w-full border-2 border-slate-200 rounded-xl p-1.5 text-xs bg-white" placeholder=".....">
+                            <input type="time" id="dtxTime" class="w-20 border-2 border-slate-200 rounded-xl p-1 text-xs bg-white">
+                            <button type="button" onclick="setNowTime('dtxTime')" class="bg-emerald-600 text-white text-[10px] px-1.5 rounded-lg">Now</button>
+                        </div>
+                    </div>
+                    <div class="p-3 bg-slate-50 rounded-xl border border-slate-200">
+                        <label class="block text-xs font-bold text-slate-700 mb-1">🩸 Blood lactate stat = (mmol/L)</label>
+                        <div class="flex gap-1">
+                            <input type="text" id="lactateValue" class="w-full border-2 border-slate-200 rounded-xl p-1.5 text-xs bg-white" placeholder=".....">
+                            <input type="time" id="lactateTime" class="w-20 border-2 border-slate-200 rounded-xl p-1 text-xs bg-white">
+                            <button type="button" onclick="setNowTime('lactateTime')" class="bg-emerald-600 text-white text-[10px] px-1.5 rounded-lg">Now</button>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Hemocultures -->
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-3">
+                    <div class="p-3 bg-slate-50 rounded-xl border border-slate-200">
+                        <label class="block text-xs font-bold text-slate-700 mb-1">🧪 Take Hemocalture 1</label>
+                        <div class="grid grid-cols-3 gap-1">
+                            <select id="hemo1Active" class="border border-slate-300 rounded-lg p-1 text-xs bg-white"><option value="No">No</option><option value="Yes">Yes</option></select>
+                            <select id="hemo1Site" class="border border-slate-300 rounded-lg p-1 text-xs bg-white"><option value="Rt">Rt</option><option value="Lt">Lt</option></select>
+                            <div class="flex gap-1">
+                                <input type="time" id="hemo1Time" class="w-full border border-slate-300 rounded-lg p-1 text-xs bg-white">
+                                <button type="button" onclick="setNowTime('hemo1Time')" class="bg-emerald-600 text-white text-[10px] px-1 rounded-md">Now</button>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="p-3 bg-slate-50 rounded-xl border border-slate-200">
+                        <label class="block text-xs font-bold text-slate-700 mb-1">🧪 Take Hemocalture 2</label>
+                        <div class="grid grid-cols-3 gap-1">
+                            <select id="hemo2Active" class="border border-slate-300 rounded-lg p-1 text-xs bg-white"><option value="No">No</option><option value="Yes">Yes</option></select>
+                            <select id="hemo2Site" class="border border-slate-300 rounded-lg p-1 text-xs bg-white"><option value="Rt">Rt</option><option value="Lt">Lt</option></select>
+                            <div class="flex gap-1">
+                                <input type="time" id="hemo2Time" class="w-full border border-slate-300 rounded-lg p-1 text-xs bg-white">
+                                <button type="button" onclick="setNowTime('hemo2Time')" class="bg-emerald-600 text-white text-[10px] px-1 rounded-md">Now</button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Antibiotics & Fluid Therapy -->
+                <div class="p-3 bg-slate-50 rounded-xl border border-slate-200 space-y-3">
+                    <div>
+                        <label class="block text-xs font-bold text-slate-700 mb-1">💊 Antibiotic</label>
+                        <div class="flex gap-2">
+                            <select id="antiActive" class="border-2 border-slate-200 rounded-xl p-1.5 text-xs bg-white font-bold"><option value="No">No</option><option value="Yes">Yes</option></select>
+                            <input type="text" id="antiText" class="flex-1 border-2 border-slate-200 rounded-xl p-1.5 text-xs bg-white" placeholder="ระบุชื่อยาปฏิชีวนะ .....">
+                            <div class="flex gap-1 items-center">
+                                <input type="time" id="antiTime" class="w-24 border-2 border-slate-200 rounded-xl p-1.5 text-xs bg-white">
+                                <button type="button" onclick="setNowTime('antiTime')" class="bg-emerald-600 text-white text-xs font-bold px-2 py-2 rounded-lg">Now</button>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-3 pt-2 border-t border-slate-200">
+                        <div>
+                            <label class="block text-xs font-bold text-slate-700 mb-1">💉 IVF เลือกชนิดสารน้ำ</label>
+                            <div class="grid grid-cols-2 gap-1 mb-1">
+                                <select id="ivfType" class="border border-slate-300 rounded-lg p-1 text-xs bg-white">
+                                    <option value="NSS">NSS</option><option value="Acetar">Acetar</option><option value="LRS">LRS</option>
+                                    <option value="5DN/2">5DN/2</option><option value="5DNSS">5DNSS</option><option value="5DW">5DW</option>
+                                </select>
+                                <select id="ivfSite" class="border border-slate-300 rounded-lg p-1 text-xs bg-white"><option value="Rt">Rt</option><option value="Lt">Lt</option></select>
+                            </div>
+                            <div class="flex gap-1">
+                                <input type="text" id="ivfRate" class="w-full border border-slate-300 rounded-lg p-1 text-xs bg-white" placeholder="IV rate ..... ml/hr">
+                                <input type="time" id="ivfTime" class="w-20 border border-slate-300 rounded-lg p-1 text-xs bg-white">
+                                <button type="button" onclick="setNowTime('ivfTime')" class="bg-emerald-600 text-white text-[10px] px-1 rounded-md">Now</button>
+                            </div>
+                        </div>
+
+                        <div>
+                            <label class="block text-xs font-bold text-slate-700 mb-1">💉 Load IVF</label>
+                            <div class="grid grid-cols-2 gap-1 mb-1">
+                                <select id="loadIvfActive" class="border border-slate-300 rounded-lg p-1 text-xs bg-white"><option value="No">No</option><option value="Yes">Yes</option></select>
+                                <select id="loadIvfType" class="border border-slate-300 rounded-lg p-1 text-xs bg-white"><option value="NSS">NSS</option><option value="Acetar">Acetar</option><option value="LRS">LRS</option></select>
+                            </div>
+                            <div class="flex gap-1">
+                                <input type="text" id="loadIvfVol" class="w-full border border-slate-300 rounded-lg p-1 text-xs bg-white" placeholder="ปริมาณ ..... ml">
+                                <input type="time" id="loadIvfTime" class="w-20 border border-slate-300 rounded-lg p-1 text-xs bg-white">
+                                <button type="button" onclick="setNowTime('loadIvfTime')" class="bg-emerald-600 text-white text-[10px] px-1 rounded-md">Now</button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Imaging & Ultrasound Diagnostics -->
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-3">
+                    <div class="p-3 bg-slate-50 rounded-xl border border-slate-200">
+                        <label class="block text-xs font-bold text-slate-700 mb-1">🗒️ EKG 12 lead</label>
+                        <div class="flex gap-2">
+                            <select id="ekgActive" class="w-full border-2 border-slate-200 rounded-xl p-1.5 text-xs bg-white font-bold"><option value="No">No</option><option value="Yes">Yes</option></select>
+                            <div class="flex gap-1 items-center">
+                                <input type="time" id="ekgTime" class="w-24 border-2 border-slate-200 rounded-xl p-1.5 text-xs bg-white">
+                                <button type="button" onclick="setNowTime('ekgTime')" class="bg-emerald-600 text-white text-xs px-2 py-2 rounded-lg">Now</button>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="p-3 bg-slate-50 rounded-xl border border-slate-200">
+                        <label class="block text-xs font-bold text-slate-700 mb-1">🩻 CXR</label>
+                        <div class="flex gap-2">
+                            <select id="cxrActive" class="border-2 border-slate-200 rounded-xl p-1.5 text-xs bg-white font-bold"><option value="No">No</option><option value="Yes">Yes</option></select>
+                            <input type="text" id="cxrResult" class="w-full border-2 border-slate-200 rounded-xl p-1.5 text-xs bg-white" placeholder="ระบุผล .....">
+                            <div class="flex gap-1 items-center">
+                                <input type="time" id="cxrTime" class="w-24 border-2 border-slate-200 rounded-xl p-1.5 text-xs bg-white">
+                                <button type="button" onclick="setNowTime('cxrTime')" class="bg-emerald-600 text-white text-xs px-2 py-2 rounded-lg">Now</button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Ultrasound & IVC -->
+                <div class="p-3 bg-slate-50 rounded-xl border border-slate-200 space-y-2">
+                    <div class="grid grid-cols-1 sm:grid-cols-2 gap-2">
+                        <div>
+                            <label class="block text-xs font-bold text-slate-700 mb-1">📹 Ultrasound เลือก</label>
+                            <select id="usType" class="w-full border border-slate-300 rounded-lg p-1.5 text-xs bg-white">
+                                <option value="Upper abdomen">Upper abdomen</option><option value="Lower abdomen">Lower abdomen</option>
+                                <option value="KUB">KUB</option><option value="Gyne">Gyne</option><option value="IVC">IVC</option><option value="Echo">Echo</option>
+                            </select>
+                        </div>
+                        <div>
+                            <label class="block text-xs font-bold text-slate-700 mb-1">🔬 IVC ระบุ</label>
+                            <select id="ivcType" class="w-full border border-slate-300 rounded-lg p-1.5 text-xs bg-white"><option value="CI">CI</option><option value="DI">DI</option></select>
+                        </div>
+                    </div>
+                    <div class="grid grid-cols-1 sm:grid-cols-2 gap-2">
+                        <input type="text" id="usResultText" class="border border-slate-300 rounded-lg p-1.5 text-xs bg-white" placeholder="ช่องระบุผลตรวจ Ultrasound .....">
+                        <div class="flex gap-1">
+                            <input type="text" id="ivcResultPercent" class="w-full border border-slate-300 rounded-lg p-1.5 text-xs bg-white" placeholder="ช่องลงผล ....... %">
+                            <input type="time" id="usTime" class="w-24 border border-slate-300 rounded-lg p-1.5 text-xs bg-white">
+                            <button type="button" onclick="setNowTime('usTime')" class="bg-emerald-600 text-white text-xs px-2 rounded-lg">Now</button>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Intubations, Catheters & Medication logs -->
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-3">
+                    <div class="p-3 bg-slate-50 rounded-xl border border-slate-200">
+                        <label class="block text-xs font-bold text-slate-700 mb-1">🆖 Retain NG</label>
+                        <div class="flex gap-1">
+                            <select id="ngActive" class="border border-slate-300 rounded-lg p-1 text-xs bg-white"><option value="No">No</option><option value="Yes">Yes</option></select>
+                            <input type="text" id="ngNo" class="w-full border border-slate-300 rounded-lg p-1 text-xs bg-white" placeholder="ระบุ No .....">
+                            <input type="time" id="ngTime" class="w-20 border border-slate-300 rounded-lg p-1 text-xs bg-white">
+                            <button type="button" onclick="setNowTime('ngTime')" class="bg-emerald-600 text-white text-[10px] px-1 rounded-md">Now</button>
+                        </div>
+                    </div>
+                    <div class="p-3 bg-slate-50 rounded-xl border border-slate-200">
+                        <label class="block text-xs font-bold text-slate-700 mb-1">🚽 Retain foley catheter</label>
+                        <div class="flex gap-1">
+                            <select id="foleyActive" class="border border-slate-300 rounded-lg p-1 text-xs bg-white"><option value="No">No</option><option value="Yes">Yes</option></select>
+                            <input type="text" id="foleyNo" class="w-full border border-slate-300 rounded-lg p-1 text-xs bg-white" placeholder="ระบุ No .....">
+                            <input type="time" id="foleyTime" class="w-20 border border-slate-300 rounded-lg p-1 text-xs bg-white">
+                            <button type="button" onclick="setNowTime('foleyTime')" class="bg-emerald-600 text-white text-[10px] px-1 rounded-md">Now</button>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="p-3 bg-slate-50 rounded-xl border border-slate-200">
+                    <label class="block text-xs font-bold text-slate-700 mb-1">💊💉 Medication record</label>
+                    <div class="flex gap-2">
+                        <input type="text" id="medRecordText" class="flex-1 border-2 border-slate-200 rounded-xl p-1.5 text-xs bg-white" placeholder="ระบุยา .....">
+                        <div class="flex gap-1 items-center">
+                            <input type="time" id="medTime" class="w-24 border-2 border-slate-200 rounded-xl p-1.5 text-xs bg-white">
+                            <button type="button" onclick="setNowTime('medTime')" class="bg-emerald-600 text-white text-xs font-bold px-2.5 py-2.5 rounded-lg">Now</button>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Re-assessment Block -->
+                <div class="p-4 bg-orange-50/70 rounded-2xl border-2 border-orange-200 space-y-3">
+                    <h3 class="text-sm font-bold text-orange-900 flex items-center gap-1"><i class="fa-solid fa-clock-rotate-left"></i> 🆘 Re-assessment Airway,Breathing,Circulation and Disability</h3>
+                    <div class="grid grid-cols-2 sm:grid-cols-4 gap-2">
+                        <div class="bg-white p-2 rounded-xl border border-orange-200 text-center">
+                            <span class="block text-[11px] font-bold text-slate-700 mb-1">Airway</span>
+                            <select id="reAirway" class="w-full border rounded text-xs p-1 bg-slate-50 font-bold mb-1"><option value="Pass">Pass</option><option value="Not pass">Not pass</option></select>
+                            <input type="time" id="reAirwayTime" class="w-full text-[10px] border rounded p-0.5 mb-1 text-center">
+                            <button type="button" onclick="setNowTime('reAirwayTime')" class="w-full bg-orange-500 text-white text-[10px] py-1 rounded font-bold">Now</button>
+                        </div>
+                        <div class="bg-white p-2 rounded-xl border border-orange-200 text-center">
+                            <span class="block text-[11px] font-bold text-slate-700 mb-1">Breathing</span>
+                            <select id="reBreathing" class="w-full border rounded text-xs p-1 bg-slate-50 font-bold mb-1"><option value="Pass">Pass</option><option value="Not pass">Not pass</option></select>
+                            <input type="time" id="reBreathingTime" class="w-full text-[10px] border rounded p-0.5 mb-1 text-center">
+                            <button type="button" onclick="setNowTime('reBreathingTime')" class="w-full bg-orange-500 text-white text-[10px] py-1 rounded font-bold">Now</button>
+                        </div>
+                        <div class="bg-white p-2 rounded-xl border border-orange-200 text-center">
+                            <span class="block text-[11px] font-bold text-slate-700 mb-1">Circulation</span>
+                            <select id="reCirculation" class="w-full border rounded text-xs p-1 bg-slate-50 font-bold mb-1"><option value="Pass">Pass</option><option value="Not pass">Not pass</option></select>
+                            <input type="time" id="reCirculationTime" class="w-full text-[10px] border rounded p-0.5 mb-1 text-center">
+                            <button type="button" onclick="setNowTime('reCirculationTime')" class="w-full bg-orange-500 text-white text-[10px] py-1 rounded font-bold">Now</button>
+                        </div>
+                        <div class="bg-white p-2 rounded-xl border border-orange-200 text-center">
+                            <span class="block text-[11px] font-bold text-slate-700 mb-1">Disability</span>
+                            <select id="reDisability" class="w-full border rounded text-xs p-1 bg-slate-50 font-bold mb-1"><option value="Pass">Pass</option><option value="Not pass">Not pass</option></select>
+                            <input type="time" id="reDisabilityTime" class="w-full text-[10px] border rounded p-0.5 mb-1 text-center">
+                            <button type="button" onclick="setNowTime('reDisabilityTime')" class="w-full bg-orange-500 text-white text-[10px] py-1 rounded font-bold">Now</button>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Disposition -->
+                <div class="bg-indigo-600 text-white p-4 rounded-2xl shadow-md space-y-2">
+                    <label class="block text-sm font-bold tracking-wide">🚑 Disposition เลือก</label>
+                    <div class="grid grid-cols-1 sm:grid-cols-3 gap-2">
+                        <select id="dispAction" class="w-full border-0 rounded-xl p-2 text-xs bg-white text-slate-800 font-bold outline-none">
+                            <option value="Refer out">Refer out</option>
+                            <option value="Admit ward">Admit ward</option>
+                            <option value="Discharge">Discharge</option>
+                        </select>
+                        <input type="text" id="dispLocation" class="w-full border-0 rounded-xl p-2 text-xs bg-white text-slate-800 outline-none" placeholder="ระบุสถานที่ .....">
+                        <div class="flex gap-2 items-center">
+                            <input type="time" id="dispTime" class="w-full border-0 rounded-xl p-2 text-xs bg-white text-slate-800 outline-none">
+                            <button type="button" onclick="setNowTime('dispTime')" class="bg-yellow-400 hover:bg-yellow-500 text-slate-900 font-black text-xs px-4 py-2.5 rounded-xl transition active:scale-95">Now</button>
+                        </div>
+                    </div>
+                </div>
+
+            </div>
+
+            <!-- 5. Continuous Text Records Inputs -->
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                <!-- บันทึกประเมินอาการ -->
+                <div class="bg-white p-5 rounded-2xl shadow-md border-t-4 border-teal-500 flex flex-col justify-between">
+                    <div>
+                        <h3 class="text-sm font-bold text-teal-800 mb-2"><i class="fa-solid fa-comment-medical"></i> 📝 ช่องเขียนประเมินอาการ</h3>
+                        <textarea id="assessmentInputText" rows="3" class="w-full border-2 border-slate-200 rounded-xl p-2.5 text-xs bg-slate-50 outline-none focus:bg-white focus:border-teal-400" placeholder="ระบุผลการประเมินอาการเพื่อเพิ่มเข้า summary record..."></textarea>
+                    </div>
+                    <button type="button" onclick="commitFreeTextNote('assessment')" class="mt-3 w-full bg-teal-600 hover:bg-teal-700 text-white font-bold text-xs py-2.5 rounded-xl transition shadow-md active:scale-95">บันทึกประเมินอาการ</button>
+                </div>
+                <!-- Alarm Record -->
+                <div class="bg-white p-5 rounded-2xl shadow-md border-t-4 border-rose-500 flex flex-col justify-between">
+                    <div>
+                        <h3 class="text-sm font-bold text-rose-800 mb-2"><i class="fa-solid fa-circle-exclamation animate-bounce"></i> 🚨 ช่องเขียน Alarm record</h3>
+                        <textarea id="alarmInputText" rows="3" class="w-full border-2 border-slate-200 rounded-xl p-2.5 text-xs bg-slate-50 outline-none focus:bg-white focus:border-rose-400" placeholder="ระบุสัญญาณเตือน/ภาวะวิกฤต เพื่อเพิ่มเข้า summary record..."></textarea>
+                    </div>
+                    <button type="button" onclick="commitFreeTextNote('alarm')" class="mt-3 w-full bg-rose-600 hover:bg-rose-700 text-white font-bold text-xs py-2.5 rounded-xl transition shadow-md active:scale-95">บันทึก Alarm Record</button>
+                </div>
+            </div>
+
+        </div>
+
+        <!-- Right Column: Note Summary Terminal View Log -->
+        <div class="lg:col-span-1">
+            <div class="bg-slate-900 text-slate-100 rounded-3xl p-6 shadow-2xl sticky top-22 border-2 border-slate-800 flex flex-col justify-between max-h-[85vh]">
+                <div class="space-y-4 overflow-hidden flex flex-col h-full">
+                    <div class="flex items-center justify-between border-b border-slate-700 pb-3 flex-shrink-0">
+                        <h2 class="text-md font-extrabold text-emerald-400 flex items-center gap-2">
+                            <i class="fa-solid fa-receipt text-xl"></i> Note Summary Log
+                        </h2>
+                        <button onclick="compileStructuredInputs()" class="bg-gradient-to-r from-emerald-400 to-teal-500 hover:from-emerald-500 hover:to-teal-600 text-slate-950 font-black text-xs px-3 py-2 rounded-xl shadow-md transition active:scale-95">
+                            <i class="fa-solid fa-arrow-down-short-wide"></i> ดึงข้อมูลฟอร์ม
+                        </button>
+                    </div>
+
+                    <!-- Snapshot Display -->
+                    <div class="bg-slate-800 rounded-xl p-3 text-xs border border-slate-700 grid grid-cols-2 gap-2 flex-shrink-0">
+                        <div><span class="text-slate-400 font-bold">📋 HN:</span> <span id="sumHN" class="font-mono text-white text-sm font-bold">-</span></div>
+                        <div><span class="text-slate-400 font-bold">👥 Age/Sex:</span> <span id="sumAgeSex" class="text-white font-bold">-</span></div>
+                        <div class="col-span-2"><span class="text-slate-400 font-bold">📆 วันที่:</span> <span id="sumDate" class="text-yellow-300 font-bold">-</span></div>
+                    </div>
+
+                    <!-- Dynamic Time-line Stream -->
+                    <div class="flex flex-col flex-1 min-h-0">
+                        <div class="flex items-center justify-between mb-2 flex-shrink-0">
+                            <h3 class="text-xs font-bold uppercase tracking-wider text-slate-400"><i class="fa-solid fa-timeline text-indigo-400"></i> Care Timeline Summary</h3>
+                            <button onclick="clearFullTimeline()" class="text-[11px] text-rose-400 hover:text-rose-300 font-bold underline transition">ล้างข้อมูลทั้งหมด</button>
+                        </div>
+                        <div id="summaryTimeline" class="space-y-2 overflow-y-auto flex-1 pr-1 border border-slate-800 bg-slate-950/50 rounded-xl p-2 font-mono text-xs">
+                            <!-- Fallback empty view placeholder -->
+                            <div id="emptyLogPlaceholder" class="text-slate-500 text-center py-8 italic font-sans">ยังไม่มีประวัติการบันทึกข้อมูลด่วนแบบ Real-time</div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Action Button for Export -->
+                <div class="pt-4 border-t border-slate-800 mt-4 flex-shrink-0">
+                    <button onclick="copyToClipboardFormatted()" class="w-full bg-gradient-to-r from-pink-500 via-purple-500 to-indigo-500 hover:from-pink-600 hover:to-purple-600 text-white font-bold py-3 rounded-2xl transition flex items-center justify-center gap-2 shadow-lg transform active:scale-98">
+                        <i class="fa-solid fa-copy text-lg"></i> คัดลอกข้อความสรุปทั้งหมด
+                    </button>
+                </div>
+            </div>
+        </div>
+
+    </main>
+
+    <!-- App System Scripts Functional Routine Layer -->
+    <script>
+        // Runtime clock handler
+        setInterval(() => {
+            const timeObj = new Date();
+            document.getElementById('liveClock').innerText = '🕒 ' + timeObj.toLocaleString('th-TH');
+        }, 1000);
+
+        // Core memory array for chronological events logging
+        let activeRecordsLog = [];
+
+        // Automation utilities for date/time setters
+        function setTodayDate(fieldId) {
+            const today = new Date().toISOString().split('T')[0];
+            document.getElementById(fieldId).value = today;
+            updateSummaryPanel();
+        }
+
+        function setNowTime(fieldId) {
+            const d = new Date();
+            const hour = String(d.getHours()).padStart(2, '0');
+            const min = String(d.getMinutes()).padStart(2, '0');
+            document.getElementById(fieldId).value = `${hour}:${min}`;
+        }
+
+        // Live refresh demographic variables instantly inside panel view
+        function updateSummaryPanel() {
+            document.getElementById('sumHN').innerText = document.getElementById('hn').value || '-';
+            const age = document.getElementById('age').value;
+            const gender = document.getElementById('gender').value;
+            document.getElementById('sumAgeSex').innerText = (age ? `${age} ปี` : '-') + ' / ' + (gender || '-');
+            document.getElementById('sumDate').innerText = document.getElementById('visitDate').value || '-';
+        }
+
+        // Calculations module for SIRS and NEWS2 algorithms
+        function calculateScores() {
+            const bt = parseFloat(document.getElementById('vsBt').value);
+            const rr = parseInt(document.getElementById('vsRr').value);
+            const hr = parseInt(document.getElementById('vsHr').value);
+            const spo2 = parseInt(document.getElementById('vsSpo2').value);
+            const o2 = document.getElementById('vsO2Support').value;
+            const scale = document.getElementById('vsSpo2Scale').value;
+            const avpu = document.getElementById('vsConscious').value;
+
+            // SIRS Scoring
+            let sirs = 0;
+            if (bt && (bt > 38.3 || bt < 36.0)) sirs++;
+            if (hr && hr > 90) sirs++;
+            if (rr && rr > 20) sirs++;
+
+            const sirsBadge = document.getElementById('sirsBadge');
+            sirsBadge.innerText = `${sirs} คะแนน`;
+            sirsBadge.className = sirs >= 2 
+                ? "px-3 py-1 rounded-full text-xs font-black bg-red-500 text-white animate-pulse" 
+                : "px-3 py-1 rounded-full text-xs font-black bg-slate-200 text-slate-700";
+
+            // NEWS2 Scoring
+            let news = 0;
+
+            // RR Check
+            if (rr) {
+                if (rr <= 8) news += 3;
+                else if (rr >= 9 && rr <= 11) news += 1;
+                else if (rr >= 12 && rr <= 20) news += 0;
+                else if (rr >= 21 && rr <= 24) news += 2;
+                else if (rr >= 25) news += 3;
+            }
+            // SpO2 Scale Check
+            if (spo2) {
+                if (scale === "1") {
+                    if (spo2 <= 91) news += 3;
+                    else if (spo2 >= 92 && spo2 <= 93) news += 2;
+                    else if (spo2 >= 94 && spo2 <= 95) news += 1;
+                    else if (spo2 >= 96) news += 0;
+                } else {
+                    if (spo2 <= 83) news += 3;
+                    else if (spo2 >= 84 && spo2 <= 85) news += 2;
+                    else if (spo2 >= 86 && spo2 <= 87) news += 1;
+                    else if (spo2 >= 88 && spo2 <= 92) news += 0;
+                    else if (spo2 >= 93 && spo2 <= 94 && o2 === "ใช้") news += 1;
+                    else if (spo2 >= 95 && spo2 <= 96 && o2 === "ใช้") news += 2;
+                    else if (spo2 >= 97 && o2 === "ใช้") news += 3;
+                }
+            }
+            // O2 Supp
+            if (o2 === "ใช้") news += 2;
+            // Temp Check
+            if (bt) {
+                if (bt <= 35.0) news += 3;
+                else if (bt >= 35.1 && bt <= 36.0) news += 1;
+                else if (bt >= 36.1 && bt <= 38.0) news += 0;
+                else if (bt >= 38.1 && bt <= 39.0) news += 1;
+                else if (bt >= 39.1) news += 3;
+            }
+            // HR Check
+            if (hr) {
+                if (hr <= 40) news += 3;
+                else if (hr >= 41 && hr <= 50) news += 1;
+                else if (hr >= 51 && hr <= 90) news += 0;
+                else if (hr >= 91 && hr <= 110) news += 1;
+                else if (hr >= 111 && hr <= 130) news += 2;
+                else if (hr >= 131) news += 3;
+            }
+            // AVPU Check
+            if (avpu !== "A") news += 3;
+
+            const newsBadge = document.getElementById('newsBadge');
+            newsBadge.innerText = `${news} คะแนน`;
+            if (news >= 7) newsBadge.className = "px-3 py-1 rounded-full text-xs font-black bg-rose-600 text-white";
+            else if (news >= 5) newsBadge.className = "px-3 py-1 rounded-full text-xs font-black bg-orange-500 text-white";
+            else if (news >= 1) newsBadge.className = "px-3 py-1 rounded-full text-xs font-black bg-yellow-400 text-slate-900";
+            else newsBadge.className = "px-3 py-1 rounded-full text-xs font-black bg-slate-200 text-slate-700";
+        }
+
+        // Clear vital signs fields explicitly
+        function clearVitalSigns() {
+            ['vsBt', 'vsRr', 'vsHr', 'vsBp', 'vsSpo2'].forEach(id => document.getElementById(id).value = '');
+            document.getElementById('vsO2Support').value = 'ไม่ใช้';
+            document.getElementById('vsSpo2Scale').value = '1';
+            document.getElementById('vsConscious').value = 'A';
+            calculateScores();
+        }
+
+        // Render routine parsing memory array content into DOM logs elements
+        function paintRecordsTimeline() {
+            const stream = document.getElementById('summaryTimeline');
+            if (activeRecordsLog.length === 0) {
+                stream.innerHTML = `<div id="emptyLogPlaceholder" class="text-slate-500 text-center py-8 italic font-sans">ยังไม่มีประวัติการบันทึกข้อมูลด่วนแบบ Real-time</div>`;
+                return;
+            }
+
+            stream.innerHTML = activeRecordsLog.map((node, pointer) => {
+                let badgeTheme = "bg-slate-800 border-slate-700 text-emerald-300";
+                if (node.classification === 'alarm') badgeTheme = "bg-rose-950/60 border-rose-900 text-rose-200";
+                if (node.classification === 'assessment') badgeTheme = "bg-teal-950/60 border-teal-900 text-teal-200";
+                if (node.classification === 'vitals') badgeTheme = "bg-amber-950/60 border-amber-900 text-amber-300";
+
+                return `
+                    <div class="p-2.5 rounded-xl border flex justify-between items-start gap-2 transition duration-200 ${badgeTheme}">
+                        <div class="flex-1">
+                            <span class="bg-black/40 px-1.5 py-0.5 rounded text-[10px] text-white font-bold font-mono">[${node.timestamp}]</span>
+                            <p class="mt-1 font-sans text-xs whitespace-pre-wrap leading-relaxed">${node.message}</p>
+                        </div>
+                        <button onclick="removeIndividualNode(${pointer})" class="text-slate-500 hover:text-rose-400 text-sm px-1 transition active:scale-90" title="ลบรายการนี้"><i class="fa-solid fa-square-xmark"></i></button>
+                    </div>
+                `;
+            }).join('');
+        }
+
+        function removeIndividualNode(pointer) {
+            activeRecordsLog.splice(pointer, 1);
+            paintRecordsTimeline();
+        }
+
+        function clearFullTimeline() {
+            if(confirm("คุณยืนยันที่จะล้างข้อมูลสรุปใน Note Summary Log ทั้งหมดใช่หรือไม่?")) {
+                activeRecordsLog = [];
+                paintRecordsTimeline();
+            }
+        }
+
+        // Intercept action storing static Vital Signs state Snapshot
+        function saveVitalSigns() {
+            const bt = document.getElementById('vsBt').value || '…..';
+            const rr = document.getElementById('vsRr').value || '…..';
+            const hr = document.getElementById('vsHr').value || '…..';
+            const bp = document.getElementById('vsBp').value || '…..';
+            const spo2 = document.getElementById('vsSpo2').value || '…..';
+            const o2 = document.getElementById('vsO2Support').value;
+            const avpu = document.getElementById('vsConscious').value;
+            const sirs = document.getElementById('sirsBadge').innerText;
+            const news = document.getElementById('newsBadge').innerText;
+
+            const rightNow = new Date();
+            const timeStampStr = String(rightNow.getHours()).padStart(2, '0') + ':' + String(rightNow.getMinutes()).padStart(2, '0');
+
+            const compiledText = `📚 Vital signs แรกรับ: BT ${bt} °C, RR ${rr} /min, HR ${hr} /min, BP ${bp} mmHg, SpO2 ${spo2}% RA + ความต้องการใช้ออกซิเจน: ${o2} + ระดับความรู้สึกตัว: ${avpu} | Score -> SIRS: ${sirs}, NEWS2: ${news}`;
+            
+            activeRecordsLog.push({ timestamp: timeStampStr, message: compiledText, classification: 'vitals' });
+            paintRecordsTimeline();
+        }
+
+        // Dynamic submission function for free form texts notes streams
+        function commitFreeTextNote(category) {
+            const targetInputId = category === 'assessment' ? 'assessmentInputText' : 'alarmInputText';
+            const element = document.getElementById(targetInputId);
+            const valueStr = element.value.trim();
+            if (!valueStr) return;
+
+            const now = new Date();
+            const timeStampStr = String(now.getHours()).padStart(2, '0') + ':' + String(now.getMinutes()).padStart(2, '0');
+            const prefixLabel = category === 'alarm' ? '🚨 [Alarm Record]: ' : '📝 [Clinical Assessment]: ';
+
+            activeRecordsLog.push({
+                timestamp: timeStampStr,
+                message: prefixLabel + valueStr,
+                classification: category
+            });
+
+            element.value = ''; // Clean field
+            paintRecordsTimeline();
+        }
+
+        // Loop parser collecting form values mapping out structures safely matching keys
+        function compileStructuredInputs() {
+            updateSummaryPanel();
+
+            const configurationLayout = [
+                { id: 'visitTime', label: (val) => `🏥 Visit ER เวลา: ${val} น.` },
+                { id: 'firstTriageTime', label: (val) => `📊 First ER Triage เวลา: ${val} น.` },
+                { id: 'nurseTriage', label: (val) => `👩🏼‍⚕️ Nurse triage ระบุ: ${val} (เวลาบันทึก: ${document.getElementById('nurseTriageTime').value || '-'} น.)` },
+                { id: 'esiLevel', label: (val) => `🆘 Level Triage: ${val} (เวลาบันทึก: ${document.getElementById('esiTime').value || '-'} น.)` },
+                
+                // Primary Survey Block Mapping
+                { id: 'psAirwayTime', label: () => `🚨 Primary survey -> 1.) Airway: ${document.getElementById('psAirway').value} [ระบุ: ${document.getElementById('psAirwayText').value || '…..'}] (เวลา: ${document.getElementById('psAirwayTime').value || '-'} น.)` },
+                { id: 'psBreathingTime', label: () => `🚨 Primary survey -> 2.) Breathing: ${document.getElementById('psBreathing').value} [ระบุ: ${document.getElementById('psBreathingText').value || '…..'}] (เวลา: ${document.getElementById('psBreathingTime').value || '-'} น.)` },
+                { id: 'psCirculationTime', label: () => `🚨 Primary survey -> 3.) Circulation: ${document.getElementById('psCirculation').value} [ระบุ: ${document.getElementById('psCirculationText').value || '…..'}] (เวลา: ${document.getElementById('psCirculationTime').value || '-'} น.)` },
+                { id: 'psDisabilityTime', label: () => `🚨 Primary survey -> 4.) Disability: ${document.getElementById('psDisability').value} [ระบุ: ${document.getElementById('psDisabilityText').value || '…..'}] (เวลา: ${document.getElementById('psDisabilityTime').value || '-'} น.)` },
+                
+                // Management Interventions Array Map Elements
+                { id: 'rrtTime', label: () => `🚑 Alert Fast Track RRT protocol: ${document.getElementById('rrtProtocol').value} (เวลา: ${document.getElementById('rrtTime').value || '-'} น.)` },
+                { id: 'drAssessTime', label: () => `🏪 แพทย์ ER ประเมินอาการ ระบุชื่อแพทย์: ${document.getElementById('drName').value || '…..'} (เวลา: ${document.getElementById('drAssessTime').value || '-'} น.)` },
+                { id: 'drDiagTime', label: (val) => `🧑🏻‍⚕️ แพทย์วินิจฉัยให้การรักษา (เวลา: ${val} น.)` },
+                { id: 'o2Time', label: () => `🌡️ Oxygen suplement เลือก: ${document.getElementById('o2Active').value} [ชนิด: ${document.getElementById('o2Type').value} flow: ${document.getElementById('o2Flow').value || '…..'} lpm] (เวลา: ${document.getElementById('o2Time').value || '-'} น.)` },
+                { id: 'labTime', label: () => `🧪 Investigation Lab ระบุ: ${document.getElementById('labText').value || '…..'} (เวลา: ${document.getElementById('labTime').value || '-'} น.)` },
+                { id: 'dtxTime', label: () => `🩸 DTX stat = ${document.getElementById('dtxValue').value || '…..'} mg/dL (เวลา: ${document.getElementById('dtxTime').value || '-'} น.)` },
+                { id: 'lactateTime', label: () => `🩸 Blood lactate stat = ${document.getElementById('lactateValue').value || '…..'} mmol/L (เวลา: ${document.getElementById('lactateTime').value || '-'} น.)` },
+                { id: 'hemo1Time', label: () => `🧪 Take Hemocalture 1: ${document.getElementById('hemo1Active').value} [เลือก: ${document.getElementById('hemo1Site').value}] (เวลา: ${document.getElementById('hemo1Time').value || '-'} น.)` },
+                { id: 'hemo2Time', label: () => `🧪 Take Hemocalture 2: ${document.getElementById('hemo2Active').value} [เลือก: ${document.getElementById('hemo2Site').value}] (เวลา: ${document.getElementById('hemo2Time').value || '-'} น.)` },
+                { id: 'antiTime', label: () => `💊 Antibiotic: ${document.getElementById('antiActive').value} [ระบุยา: ${document.getElementById('antiText').value || '…..'}] (เวลา: ${document.getElementById('antiTime').value || '-'} น.)` },
+                { id: 'ivfTime', label: () => `💉 IVF เลือกชนิดสารน้ำ: ${document.getElementById('ivfType').value} [IV rate: ${document.getElementById('ivfRate').value || '…..'} ml/hr, เลือก: ${document.getElementById('ivfSite').value}] (เวลา: ${document.getElementById('ivfTime').value || '-'} น.)` },
+                { id: 'loadIvfTime', label: () => `💉 Load IVF เลือก: ${document.getElementById('loadIvfActive').value} [ชนิดสารน้ำ: ${document.getElementById('loadIvfType').value} ปริมาณ: ${document.getElementById('loadIvfVol').value || '…..'} ml] (เวลา: ${document.getElementById('loadIvfTime').value || '-'} น.)` },
+                { id: 'ekgTime', label: () => `🗒️ EKG 12 lead เลือก: ${document.getElementById('ekgActive').value} (เวลา: ${document.getElementById('ekgTime').value || '-'} น.)` },
+                { id: 'cxrTime', label: () => `🩻 CXR เลือก: ${document.getElementById('cxrActive').value} [ระบุผล: ${document.getElementById('cxrResult').value || '…..'}] (เวลา: ${document.getElementById('cxrTime').value || '-'} น.)` },
+                { id: 'usTime', label: () => `📹 Ultrasound เลือก: ${document.getElementById('usType').value} [ช่องระบุผลตรวจ: ${document.getElementById('usResultText').value || '…..'}] + 🔬 IVC ระบุ: ${document.getElementById('ivcType').value} [ช่องลงผล: ${document.getElementById('ivcResultPercent').value || '…..'} %] (เวลา: ${document.getElementById('usTime').value || '-'} น.)` },
+                { id: 'ngTime', label: () => `🆖 Retain NG เลือก: ${document.getElementById('ngActive').value} [ระบุ No: ${document.getElementById('ngNo').value || '…..'}] (เวลา: ${document.getElementById('ngTime').value || '-'} น.)` },
+                { id: 'foleyTime', label: () => `🚽 Retain foley catheter เลือก: ${document.getElementById('foleyActive').value} [ระบุ No: ${document.getElementById('foleyNo').value || '…..'}] (เวลา: ${document.getElementById('foleyTime').value || '-'} น.)` },
+                { id: 'medTime', label: () => `💊💉 Medication record ระบุยา: ${document.getElementById('medRecordText').value || '…..'} (เวลา: ${document.getElementById('medTime').value || '-'} น.)` },
+                
+                // Re-assessment Block Parsing Integration
+                { id: 'reAirwayTime', label: () => `🆘 Re-assessment -> [Airway: ${document.getElementById('reAirway').value} (${document.getElementById('reAirwayTime').value || '-'})] | [Breathing: ${document.getElementById('reBreathing').value} (${document.getElementById('reBreathingTime').value || '-'})] | [Circulation: ${document.getElementById('reCirculation').value} (${document.getElementById('reCirculationTime').value || '-'})] | [Disability: ${document.getElementById('reDisability').value} (${document.getElementById('reDisabilityTime').value || '-'})]` },
+                
+                // Final Disposition Status Element
+                { id: 'dispTime', label: () => `🚑 Disposition เลือก: ${document.getElementById('dispAction').value} [ระบุสถานที่: ${document.getElementById('dispLocation').value || '…..'}] (เวลา: ${document.getElementById('dispTime').value || '-'} น.)` }
+            ];
+
+            configurationLayout.forEach(nodeItem => {
+                const elementValue = document.getElementById(nodeItem.id)?.value;
+                if (elementValue) {
+                    const outputMessage = nodeItem.label(elementValue);
+                    
+                    // ป้องกันการแทรกข้อมูลซ้ำซ้อนในไทม์ไลน์
+                    if (!activeRecordsLog.some(existing => existing.message.substring(0, 30) === outputMessage.substring(0, 30))) {
+                        activeRecordsLog.push({
+                            timestamp: elementValue.includes(':') ? elementValue : new Date().toLocaleTimeString('th-TH', { hour: '2-digit', minute: '2-digit' }),
+                            message: outputMessage,
+                            classification: 'clinical'
+                        });
+                    }
+                }
+            });
+
+            paintRecordsTimeline();
+        }
+
+        // Copy formatter engine merging structural metrics to local system clipboard buffer
+        function copyToClipboardFormatted() {
+            const hn = document.getElementById('sumHN').innerText;
+            const ageSex = document.getElementById('sumAgeSex').innerText;
+            const date = document.getElementById('sumDate').innerText;
+
+            let plainClipboardText = `====================================\n`;
+            plainClipboardText += `      ER MPH NURSE NOTE SUMMARY     \n`;
+            plainClipboardText += `====================================\n`;
+            plainClipboardText += `📋 HN ผู้ป่วย: ${hn}\n`;
+            plainClipboardText += `👥 อายุ/เพศ: ${ageSex}\n`;
+            plainClipboardText += `📆 วันที่เข้ารับบริการ: ${date}\n`;
+            plainClipboardText += `------------------------------------\n`;
+            plainClipboardText += `⏱️ TIMELINE CARE & CLINICAL PROGRESS LOGS:\n\n`;
+
+            if (activeRecordsLog.length === 0) {
+                plainClipboardText += `- ไม่มีรายการบันทึกข้อมูลย่อยเพิ่มเติม -\n`;
+            } else {
+                activeRecordsLog.forEach((node, i) => {
+                    plainClipboardText += `${i + 1}. [${node.timestamp}] ${node.message}\n`;
+                });
+            }
+
+            plainClipboardText += `\n------------------------------------\n`;
+            plainClipboardText += `By Bunchai Juntama ENP 2026\n`;
+            plainClipboardText += `====================================`;
+
+            navigator.clipboard.writeText(plainClipboardText).then(() => {
+                alert('✓ คัดลอก Nurse Note สรุปทั้งหมดไปยัง Clipboard สำเร็จแล้ว!');
+            }).catch(err => {
+                alert('✖ ไม่สามารถคัดลอกข้อมูลได้: ' + err);
+            });
+        }
+    </script>
+</body>
+</html>
